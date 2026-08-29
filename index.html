@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adjarindo HTML Generator AI</title>
-    
+
+    <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#0f172a">
     <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Adjarindo AI Gen","short_name":"AdjarindoAI","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","icons":[{"src":"data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3EA%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
 
+    <!-- Tailwind, Font Awesome, JSZip & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -24,30 +26,10 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .modal-open { display: flex !important; }
-        .tab-btn.active {
-            border-bottom-width: 2px !important;
-            color: #60a5fa !important;
-        }
-        .tab-btn:not(.active) {
-            border-bottom: 2px solid transparent !important;
-            color: #94a3b8 !important;
-        }
-        #previewFrame {
-            width: 100%;
-            height: 100%;
-            min-height: 400px;
-            border: none;
-            background: white;
-        }
-        @media (min-width: 768px) {
-            #previewFrame { min-height: 500px; }
-        }
-        .loading-dot { animation: bounce 1s infinite alternate; }
-        @keyframes bounce { 0% { opacity: 0.2; transform: translateY(0); } 100% { opacity: 1; transform: translateY(-5px); } }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .modal-open { display: flex !important; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
@@ -56,8 +38,8 @@
     <header class="glass sticky top-0 z-40 p-4 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <svg width="40" height="40" viewBox="0 0 100 100">
-                    <defs><linearGradient id="gradA" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="50%" stop-color="#f97316"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+                <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="gradA" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" /><stop offset="50%" style="stop-color:#f97316;stop-opacity:1" /><stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" /></linearGradient></defs>
                     <path d="M20 80 L50 10 L80 80 L65 80 L50 45 L35 80 Z" fill="url(#gradA)"/>
                 </svg>
                 <div>
@@ -78,24 +60,35 @@
 
     <!-- Main Content -->
     <main class="flex-grow container mx-auto p-4 md:p-8 grid md:grid-cols-2 gap-6">
-        
+
         <!-- LEFT: Form -->
         <section class="glass rounded-2xl p-6 space-y-4 h-fit">
             <h2 class="text-xl font-bold mb-4"><i class="fa-solid fa-wand-magic-sparkles text-blue-400 mr-2"></i>Konfigurasi Generate</h2>
-            
+
             <div>
                 <label class="text-sm text-slate-400 block mb-1">Deskripsi Web / Aplikasi</label>
-                <textarea id="promptInput" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500" rows="3" placeholder="Contoh: Landing page untuk cafe dengan menu dan tombol pesan"></textarea>
-                <p class="text-[10px] text-slate-500 mt-1">Maksimal 500 karakter untuk hasil optimal</p>
+                <textarea id="promptInput" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500" rows="3" placeholder="Contoh: Bikin landing page agen properti..."></textarea>
             </div>
 
-            <!-- PILIHAN API PROVIDER -->
-            <div>
-                <label class="text-sm text-slate-400 block mb-1">Pilih AI Provider</label>
-                <select id="apiProvider" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500">
-                    <option value="gemini">Gemini AI (2.0 Flash)</option>
-                    <option value="groq">Groq Cloud</option>
-                </select>
+            <!-- PROVIDER + MODEL GEMINI -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-sm text-slate-400 block mb-1">Provider AI</label>
+                    <select id="provider" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500">
+                        <option value="gemini" selected>Gemini (Default)</option>
+                        <option value="groq">Groq</option>
+                        <option value="auto">Auto (Gemini ke Groq)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm text-slate-400 block mb-1">Model Gemini</label>
+                    <select id="geminiModel" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500">
+                        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash</option>
+                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                    </select>
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -138,48 +131,38 @@
                 </div>
             </div>
 
-            <!-- DROPDOWN MODEL GROQ -->
-            <div id="groqModelContainer" style="display:none;">
+            <!-- DROPDOWN MODEL GROQ (HANYA MODEL CHAT/TEKS) -->
+            <div>
                 <label class="text-sm text-slate-400 block mb-1">Model Groq</label>
                 <select id="groqModel" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500">
+                    <optgroup label="OpenAI (OSS)">
+                        <option value="openai/gpt-oss-120b" selected>GPT-OSS 120B (Default)</option>
+                        <option value="openai/gpt-oss-20b">GPT-OSS 20B</option>
+                    </optgroup>
+                    <optgroup label="Groq Compound">
+                        <option value="groq/compound">Compound</option>
+                        <option value="groq/compound-mini">Compound Mini</option>
+                    </optgroup>
                     <optgroup label="Alibaba Cloud">
-                        <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b</option>
-                        <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b</option>
-                    </optgroup>
-                    <optgroup label="Canopy Labs">
-                        <option value="canopylabs/orpheus-arabic-saudi">canopylabs/orpheus-arabic-saudi</option>
-                        <option value="canopylabs/orpheus-v1-english">canopylabs/orpheus-v1-english</option>
-                    </optgroup>
-                    <optgroup label="Groq">
-                        <option value="groq/compound" selected>groq/compound</option>
-                        <option value="groq/compound-mini">groq/compound-mini</option>
-                    </optgroup>
-                    <optgroup label="Meta">
-                        <option value="meta-llama/llama-prompt-guard-2-28b">meta-llama/llama-prompt-guard-2-28b</option>
-                        <option value="meta-llama/llama-prompt-guard-2-86b">meta-llama/llama-prompt-guard-2-86b</option>
-                    </optgroup>
-                    <optgroup label="OpenAI">
-                        <option value="openai/gpt-oss-120b">openai/gpt-oss-120b</option>
-                        <option value="openai/gpt-oss-20b">openai/gpt-oss-20b</option>
-                        <option value="openai/gpt-oss-safeguard-20b">openai/gpt-oss-safeguard-20b</option>
-                        <option value="whisper-large-v3">whisper-large-v3</option>
-                        <option value="whisper-large-v3-turbo">whisper-large-v3-turbo</option>
+                        <option value="qwen/qwen3.6-27b">Qwen 3.6 27B</option>
+                        <option value="qwen/qwen3.8-27b">Qwen 3.8 27B</option>
                     </optgroup>
                 </select>
+                <p class="text-[10px] text-slate-500 mt-1">Mode "Auto": kalau Gemini limit/error, lanjut otomatis ke model Groq ini.</p>
             </div>
 
             <button id="generateBtn" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-lg transition transform hover:scale-[1.02]">
                 <i class="fa-solid fa-bolt mr-2"></i>Generate Kode
             </button>
 
-            <div id="statusLog" class="text-xs text-slate-500 mt-2 font-mono min-h-[20px]"></div>
+            <div id="statusLog" class="text-xs text-slate-500 mt-2 font-mono">Siap. Isi deskripsi lalu klik Generate.</div>
         </section>
 
         <!-- RIGHT: Output -->
         <section class="glass rounded-2xl p-6 flex flex-col">
             <div class="flex justify-between items-center mb-4 gap-2">
-                <h2 class="text-xl font-bold"><i class="fa-solid fa-code text-purple-400 mr-2"></i>Hasil & Preview</h2>
-                <button id="downloadBtn" disabled class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition">
+                <h2 class="text-xl font-bold"><i class="fa-solid fa-code text-purple-400 mr-2"></i>Hasil &amp; Preview</h2>
+                <button id="downloadBtn" disabled class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
                     <i class="fa-solid fa-file-zipper mr-1"></i>Download .zip
                 </button>
             </div>
@@ -193,7 +176,7 @@
 
             <div class="flex-grow min-h-[400px] bg-slate-950/50 rounded-xl overflow-hidden border border-slate-800">
                 <div id="previewTab" class="tab-content w-full h-full">
-                    <iframe id="previewFrame" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+                    <iframe id="previewFrame" class="w-full h-[400px] md:h-full bg-white" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
                 </div>
                 <div id="htmlTab" class="tab-content hidden p-4 overflow-auto h-[400px] md:h-full">
                     <pre class="text-xs text-green-400 whitespace-pre-wrap break-all" id="htmlCode">// Hasil HTML akan muncul di sini</pre>
@@ -215,15 +198,15 @@
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
             <h2 class="text-xl font-bold mb-4"><i class="fa-solid fa-key text-yellow-400 mr-2"></i>Pengaturan API</h2>
-            <p class="text-xs text-slate-400">API Key disimpan di localStorage browser.</p>
-            
+            <p class="text-xs text-slate-400">API Key disimpan lokal di browser (localStorage). Gunakan Free Tier, jangan key berbayar.</p>
+
             <div>
-                <label class="text-sm text-slate-400 block mb-1">Gemini API Key (2.0 Flash)</label>
+                <label class="text-sm text-slate-400 block mb-1">Gemini API Key <span class="text-slate-500">(aistudio.google.com)</span></label>
                 <input type="password" id="geminiKeyInput" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="AIza...">
             </div>
 
             <div>
-                <label class="text-sm text-slate-400 block mb-1">Groq API Key</label>
+                <label class="text-sm text-slate-400 block mb-1">Groq API Key <span class="text-slate-500">(console.groq.com)</span></label>
                 <input type="password" id="groqKeyInput" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="gsk_...">
             </div>
 
@@ -236,341 +219,402 @@
     <!-- Footer -->
     <footer class="glass mt-8 py-8 px-4 text-center text-slate-400 text-sm">
         <div class="container mx-auto">
-            <p class="font-bold text-slate-300">Copyright Adjarindo Creative Aksara</p>
-            <p><i class="fa-solid fa-globe mr-1"></i><a href="https://AjarInd.web.id" target="_blank" class="text-blue-400 hover:underline">AjarInd.web.id</a></p>
+            <div class="flex justify-center mb-4">
+                <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="gradFooter" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" /><stop offset="50%" style="stop-color:#f97316;stop-opacity:1" /><stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" /></linearGradient></defs>
+                    <path d="M20 80 L50 10 L80 80 L65 80 L50 45 L35 80 Z" fill="url(#gradFooter)"/>
+                </svg>
+            </div>
+            <p class="font-bold text-slate-300 mb-2">Copyright Adjarindo Creative Aksara</p>
+            <p class="mb-2">Alamat: Alamanda Regecy, Jl. Kenanga 3. Blok K10/20. Karangsatria. Tambun Utara. Kab.Bekasi.</p>
+            <p class="mb-2">
+                <i class="fa-solid fa-phone mr-1"></i>Telp./WhatsApp:
+                <a href="https://wa.me/6282112038795" class="text-blue-400 hover:underline">0821-1203-8795</a> atau
+                <a href="https://wa.me/6285710908070" class="text-blue-400 hover:underline">0857-1090-8070</a>
+            </p>
+            <p class="mb-2"><i class="fa-solid fa-envelope mr-1"></i>Email: <a href="mailto:ajarind890@gmail.com" class="text-blue-400 hover:underline">ajarind890@gmail.com</a></p>
+            <p><i class="fa-solid fa-globe mr-1"></i>Web.: <a href="https://AjarInd.web.id" target="_blank" class="text-blue-400 hover:underline">AjarInd.web.id</a></p>
         </div>
     </footer>
 
     <script>
-        // ============================================================
-        // LOCAL STORAGE
-        // ============================================================
-        const getKeys = () => ({
-            gemini: localStorage.getItem('gemini_key') || '',
-            groq: localStorage.getItem('groq_key') || ''
-        });
+        // ==========================================================
+        // VERSI ANTI-BOBOL:
+        // Tidak ada backslash dan tidak ada tag penutup script
+        // yang ditulis langsung di dalam kode JS ini, sehingga
+        // aman dari copy-paste / editor yang "merapikan" kode.
+        // ==========================================================
 
-        const saveKeys = (gemini, groq) => {
-            localStorage.setItem('gemini_key', gemini);
-            localStorage.setItem('groq_key', groq);
+        // ===== KONSTANTA KARAKTER =====
+        var NL = String.fromCharCode(10);          // newline
+        var BT = String.fromCharCode(96);          // backtick
+        var BS = String.fromCharCode(92);          // backslash
+        var FENCE = BT + BT + BT;                  // tiga backtick (code fence markdown)
+        var S_OPEN = '<scr' + 'ipt>';              // tag pembuka script (string biasa)
+        var S_CLOSE = '</scr' + 'ipt>';            // tag penutup script (dipecah biar aman)
+        var S_CLOSE_ESC = '<' + BS + '/scr' + 'ipt>'; // bentuk aman utk disisipkan dlm script
+
+        // ===== LOCAL STORAGE =====
+        var store = {
+            get: function (k, d) { try { var v = localStorage.getItem(k); return (v === null || v === undefined) ? (d || '') : v; } catch (e) { return (d || ''); } },
+            set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
         };
 
+        var getKeys = function () {
+            return { gemini: store.get('gemini_key'), groq: store.get('groq_key') };
+        };
+
+        // ===== ELEMENTS =====
+        var generateBtn = document.getElementById('generateBtn');
+        var statusLog = document.getElementById('statusLog');
+        var downloadBtn = document.getElementById('downloadBtn');
+        var settingsModal = document.getElementById('settingsModal');
+        var lastResponse = { html: '', css: '', js: '' };
+
+        var openSettings = function () { settingsModal.classList.add('modal-open', 'flex'); };
+        var closeSettingsFn = function () { settingsModal.classList.remove('modal-open', 'flex'); };
+
+        // Load keys & preferensi
         document.getElementById('geminiKeyInput').value = getKeys().gemini;
         document.getElementById('groqKeyInput').value = getKeys().groq;
+        document.getElementById('provider').value = store.get('pref_provider', 'gemini');
+        document.getElementById('geminiModel').value = store.get('pref_geminiModel', 'gemini-2.5-flash');
+        document.getElementById('groqModel').value = store.get('pref_groqModel', 'openai/gpt-oss-120b');
 
-        // Modal
-        document.getElementById('settingsBtn').onclick = () => {
-            document.getElementById('settingsModal').classList.add('modal-open', 'flex');
-        };
-        document.getElementById('closeSettings').onclick = () => {
-            document.getElementById('settingsModal').classList.remove('modal-open', 'flex');
-        };
-        document.getElementById('saveKeysBtn').onclick = () => {
-            saveKeys(
-                document.getElementById('geminiKeyInput').value.trim(),
-                document.getElementById('groqKeyInput').value.trim()
-            );
-            alert('✅ API Key disimpan!');
-            document.getElementById('settingsModal').classList.remove('modal-open', 'flex');
-        };
+        ['provider', 'geminiModel', 'groqModel'].forEach(function (id) {
+            document.getElementById(id).addEventListener('change', function (e) { store.set('pref_' + id, e.target.value); });
+        });
 
-        // ============================================================
-        // ELEMENTS
-        // ============================================================
-        const generateBtn = document.getElementById('generateBtn');
-        const statusLog = document.getElementById('statusLog');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const apiProvider = document.getElementById('apiProvider');
-        const groqModelContainer = document.getElementById('groqModelContainer');
-        let lastResponse = { html: '', css: '', js: '' };
+        // Modal Logic
+        document.getElementById('settingsBtn').addEventListener('click', openSettings);
+        document.getElementById('closeSettings').addEventListener('click', closeSettingsFn);
+        settingsModal.addEventListener('click', function (e) { if (e.target === settingsModal) closeSettingsFn(); });
+        document.getElementById('saveKeysBtn').addEventListener('click', function () {
+            store.set('gemini_key', document.getElementById('geminiKeyInput').value.trim());
+            store.set('groq_key', document.getElementById('groqKeyInput').value.trim());
+            alert('API Key berhasil disimpan!');
+            closeSettingsFn();
+        });
 
-        apiProvider.onchange = function() {
-            groqModelContainer.style.display = this.value === 'groq' ? 'block' : 'none';
-        };
-
-        // ============================================================
-        // BUILD SYSTEM PROMPT (DI PERPENDEK)
-        // ============================================================
+        // ===== SYSTEM PROMPT =====
         function buildSystemPrompt() {
-            const framework = document.getElementById('framework').value;
-            const style = document.getElementById('style').value;
-            const font = document.getElementById('font').value;
-            const icons = document.getElementById('icons').value;
-            const userPrompt = document.getElementById('promptInput').value.slice(0, 300); // Batasi 300 karakter
+            var framework = document.getElementById('framework').value;
+            var style = document.getElementById('style').value;
+            var font = document.getElementById('font').value;
+            var icons = document.getElementById('icons').value;
+            var userPrompt = document.getElementById('promptInput').value;
 
-            return `Buat web dari deskripsi. Output JSON: {"html":"...", "css":"...", "js":"..."}
-
-HTML: isi body saja (tanpa html/head/body)
-CSS: styling penuh, responsif
-JS: semua interaksi berfungsi
-
-CSS: ${framework}
-Desain: ${style}
-Font: ${font}
-Icons: ${icons}
-
-User: ${userPrompt}`;
+            return 'Anda adalah AI Expert Web Developer. Tugas: Buat kode web berdasarkan instruksi.' + NL +
+                'Aturan WAJIB:' + NL +
+                '1. Output HANYA berupa JSON valid murni. DILARANG memakai pembungkus markdown code fence atau teks apa pun di luar JSON.' + NL +
+                '2. Struktur JSON: {"html": "...", "css": "...", "js": "..."}' + NL +
+                '3. Jangan masukkan tag style atau script inline di dalam nilai "html". Pisahkan ke "css" dan "js".' + NL +
+                '4. Jangan tulis tag html, head, atau body utuh. Isi "html" hanya struktur di dalam body.' + NL +
+                '5. Konten teks website gunakan Bahasa Indonesia (kecuali diminta lain).' + NL +
+                '6. Ikon memakai class dari library: ' + icons + '.' + NL + NL +
+                'Spesifikasi:' + NL +
+                '- Framework CSS: ' + framework + NL +
+                '- Desain Konsep: ' + style + NL +
+                '- Font: ' + font + ' (via Google Fonts)' + NL +
+                '- Icons: ' + icons + ' (via CDN)' + NL + NL +
+                'Instruksi User: ' + userPrompt;
         }
 
-        // ============================================================
-        // GENERATE
-        // ============================================================
+        // ===== HELPER: LINK ASET (dipakai preview & zip) =====
+        function getAssetLinks() {
+            var fontName = document.getElementById('font').value;
+            var fw = document.getElementById('framework').value;
+            var icons = document.getElementById('icons').value;
+
+            var fontLink = '<link href="https://fonts.googleapis.com/css2?family=' + fontName.split(' ').join('+') + ':wght@400;600;800&display=swap" rel="stylesheet">';
+
+            var iconLink = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">';
+            if (icons.indexOf('Boxicons') > -1) iconLink = '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">';
+            else if (icons.indexOf('Remix') > -1) iconLink = '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">';
+
+            var fwHead = '', fwBody = '';
+            if (fw.indexOf('Tailwind') > -1) {
+                fwHead = '<script src="https://cdn.tailwindcss.com">' + S_CLOSE;
+            } else if (fw.indexOf('Bootstrap') > -1) {
+                fwHead = '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">';
+                fwBody = '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">' + S_CLOSE;
+            }
+            return { fontLink: fontLink, iconLink: iconLink, fwHead: fwHead, fwBody: fwBody };
+        }
+
+        // ===== API CALLING (TIMEOUT 90 DETIK) =====
+        function fetchWithTimeout(url, options, ms) {
+            options = options || {}; ms = ms || 90000;
+            var ctrl = new AbortController();
+            var timer = setTimeout(function () { ctrl.abort(); }, ms);
+            return fetch(url, Object.assign({}, options, { signal: ctrl.signal })).finally(function () { clearTimeout(timer); });
+        }
+
+        async function callGemini(prompt, key, model) {
+            var res = await fetchWithTimeout(
+                'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key),
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: 'application/json', temperature: 0.7 }
+                    })
+                }
+            );
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) throw new Error((data && data.error && data.error.message) ? data.error.message : ('HTTP ' + res.status));
+            var cand = data.candidates && data.candidates[0];
+            var text = (cand && cand.content && cand.content.parts) ? cand.content.parts.map(function (p) { return p.text || ''; }).join('') : '';
+            if (!text) throw new Error('Respon kosong (kemungkinan kena safety filter)');
+            return text;
+        }
+
+        async function callGroq(prompt, key, model) {
+            var res = await fetchWithTimeout(
+                'https://api.groq.com/openai/v1/chat/completions',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            { role: 'system', content: 'You are an expert web developer AI. You MUST reply with ONLY a valid JSON object with keys html, css, js. No markdown, no explanation.' },
+                            { role: 'user', content: prompt }
+                        ],
+                        response_format: { type: 'json_object' },
+                        temperature: 0.7
+                    })
+                }
+            );
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) throw new Error((data && data.error && data.error.message) ? data.error.message : ('HTTP ' + res.status));
+            var text = (data.choices && data.choices[0] && data.choices[0].message) ? (data.choices[0].message.content || '') : '';
+            if (!text) throw new Error('Respon kosong dari Groq');
+            return text;
+        }
+
+        function setBusy(busy, msg) {
+            generateBtn.disabled = busy;
+            generateBtn.innerHTML = busy
+                ? '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Generating...'
+                : '<i class="fa-solid fa-bolt mr-2"></i>Generate Kode';
+            if (msg) statusLog.innerHTML = msg;
+        }
+
+        // ===== LOGIKA PROVIDER: GEMINI / GROQ / AUTO =====
         async function generateCode() {
-            const keys = getKeys();
-            const provider = apiProvider.value;
-            
-            if (provider === 'gemini' && !keys.gemini) {
-                alert('⚠️ Masukkan Gemini API Key di Settings!');
+            var keys = getKeys();
+            var provider = document.getElementById('provider').value;
+            var geminiModel = document.getElementById('geminiModel').value;
+            var groqModel = document.getElementById('groqModel').value;
+
+            if (!document.getElementById('promptInput').value.trim()) {
+                alert('Tulis dulu deskripsi web/aplikasi yang mau digenerate!');
                 return;
             }
-            if (provider === 'groq' && !keys.groq) {
-                alert('⚠️ Masukkan Groq API Key di Settings!');
-                return;
-            }
+            if (provider === 'gemini' && !keys.gemini) { alert('API Key Gemini belum diisi. Buka Settings (ikon gear).'); openSettings(); return; }
+            if (provider === 'groq' && !keys.groq) { alert('API Key Groq belum diisi. Buka Settings (ikon gear).'); openSettings(); return; }
+            if (provider === 'auto' && !keys.gemini && !keys.groq) { alert('Isi minimal satu API Key (Gemini/Groq) di Settings.'); openSettings(); return; }
 
-            const prompt = buildSystemPrompt();
-            statusLog.innerHTML = "⏳ Menghubungi " + (provider === 'gemini' ? 'Gemini' : 'Groq') + "...";
-            generateBtn.disabled = true;
-            generateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Generating...';
-            downloadBtn.disabled = true;
+            var prompt = buildSystemPrompt();
+            var targetName = (provider === 'groq') ? ('Groq (' + groqModel + ')') : ('Gemini (' + geminiModel + ')');
+            setBusy(true, 'Menghubungi ' + targetName + '...');
 
-            try {
-                let responseText = '';
-                
-                if (provider === 'gemini') {
-                    // FIX: Pakai gemini-2.0-flash (yang stabil)
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${keys.gemini}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { 
-                                responseMimeType: "application/json",
-                                temperature: 0.7,
-                                maxOutputTokens: 2048
-                            }
-                        })
-                    });
-                    
-                    const data = await res.json();
-                    if (!data.candidates || data.candidates.length === 0) {
-                        throw new Error(data.error?.message || "Gemini Error");
+            var text = null;
+
+            // 1) Gemini
+            if (provider !== 'groq' && keys.gemini) {
+                try {
+                    text = await callGemini(prompt, keys.gemini, geminiModel);
+                } catch (e) {
+                    console.error('Gemini error:', e);
+                    if (provider === 'auto' && keys.groq) {
+                        statusLog.innerHTML = 'Gemini gagal: ' + e.message + '<br>Fallback ke Groq (' + groqModel + ')...';
+                    } else {
+                        setBusy(false, 'Gemini Error: ' + e.message);
+                        return;
                     }
-                    responseText = data.candidates[0].content.parts[0].text;
-                    
-                } else {
-                    // GROQ - dengan prompt yang lebih pendek
-                    const selectedModel = document.getElementById('groqModel').value;
-                    
-                    // Potong prompt jika terlalu panjang
-                    const shortPrompt = prompt.length > 2000 ? prompt.slice(0, 2000) : prompt;
-                    
-                    const resGroq = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json', 
-                            'Authorization': `Bearer ${keys.groq}` 
-                        },
-                        body: JSON.stringify({
-                            model: selectedModel,
-                            messages: [
-                                { role: "system", content: "Output JSON only: {\"html\":\"...\",\"css\":\"...\",\"js\":\"...\"}" }, 
-                                { role: "user", content: shortPrompt }
-                            ],
-                            response_format: { type: "json_object" },
-                            temperature: 0.5,
-                            max_tokens: 2048
-                        })
-                    });
-                    
-                    const dataGroq = await resGroq.json();
-                    if (!dataGroq.choices || dataGroq.choices.length === 0) {
-                        throw new Error(dataGroq.error?.message || "Groq Error");
-                    }
-                    responseText = dataGroq.choices[0].message.content;
                 }
-
-                processAIResponse(responseText);
-                
-            } catch (error) {
-                statusLog.innerHTML = "❌ Error: " + error.message;
-                console.error("API Error:", error);
             }
-            
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = '<i class="fa-solid fa-bolt mr-2"></i>Generate Kode';
+
+            // 2) Groq
+            if (!text && keys.groq && (provider === 'groq' || provider === 'auto')) {
+                try {
+                    text = await callGroq(prompt, keys.groq, groqModel);
+                } catch (e) {
+                    console.error('Groq error:', e);
+                    setBusy(false, 'Groq Error: ' + e.message);
+                    return;
+                }
+            }
+
+            if (!text) {
+                setBusy(false, 'Tidak ada API yang berhasil merespons. Cek API Key/kuota di Settings.');
+                return;
+            }
+
+            processAIResponse(text);
+            setBusy(false);
         }
 
-        // ============================================================
-        // PROCESS RESPONSE
-        // ============================================================
-        function processAIResponse(text) {
+        // ===== PARSE & RENDER =====
+        function processAIResponse(rawText) {
             try {
-                text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const parsed = JSON.parse(text);
-                
-                let htmlPart = parsed.html || '';
-                let cssPart = parsed.css || '';
-                let jsPart = parsed.js || '';
+                var text = String(rawText);
+                // Buang code fence markdown kalau AI bandel
+                text = text.split(FENCE + 'json').join('').split(FENCE + 'JSON').join('').split(FENCE).join('').trim();
 
-                // Ekstrak style/script
-                if (!cssPart && htmlPart) {
-                    const styleMatch = htmlPart.match(/<style[^>]*>([\s\S]*?)<\/style>/);
-                    if (styleMatch) {
-                        cssPart = styleMatch[1].trim();
-                        htmlPart = htmlPart.replace(/<style[^>]*>[\s\S]*?<\/style>/, '');
-                    }
+                // Ambil blok JSON paling luar kalau ada teks nyelip
+                var s = text.indexOf('{');
+                var e2 = text.lastIndexOf('}');
+                if (s > -1 && e2 > s) text = text.slice(s, e2 + 1);
+
+                var parsed = JSON.parse(text);
+                var htmlPart = parsed.html || parsed.HTML || '';
+                var cssPart = parsed.css || parsed.CSS || '';
+                var jsPart = parsed.js || parsed.javascript || '';
+
+                // Kalau AI balikin dokumen utuh, ambil isi body saja
+                var reBody = new RegExp('<body[^>]*>(.*)</body>', 'is');
+                var bm = htmlPart.match(reBody);
+                if (bm) htmlPart = bm[1];
+
+                // Ekstrak semua blok style dari HTML
+                var reStyles = new RegExp('<style[^>]*>(.*?)</style>', 'gis');
+                var styleBlocks = Array.from(htmlPart.matchAll(reStyles));
+                if (styleBlocks.length) {
+                    cssPart = [cssPart].concat(styleBlocks.map(function (m) { return m[1].trim(); })).filter(Boolean).join(NL + NL);
+                    htmlPart = htmlPart.replace(reStyles, '');
                 }
-                if (!jsPart && htmlPart) {
-                    const scriptMatch = htmlPart.match(/<script[^>]*>([\s\S]*?)<\/script>/);
-                    if (scriptMatch) {
-                        jsPart = scriptMatch[1].trim();
-                        htmlPart = htmlPart.replace(/<script[^>]*>[\s\S]*?<\/script>/, '');
-                    }
+
+                // Ekstrak semua blok script inline dari HTML
+                var reScripts = new RegExp('<scr' + 'ipt[^>]*>(.*?)</scr' + 'ipt>', 'gis');
+                var scriptBlocks = Array.from(htmlPart.matchAll(reScripts));
+                if (scriptBlocks.length) {
+                    jsPart = [jsPart].concat(scriptBlocks.map(function (m) { return m[1].trim(); })).filter(Boolean).join(NL + NL);
+                    htmlPart = htmlPart.replace(reScripts, '');
                 }
+
+                if (!htmlPart.trim()) throw new Error('AI tidak mengembalikan kode HTML');
 
                 lastResponse = { html: htmlPart, css: cssPart, js: jsPart };
 
-                document.getElementById('htmlCode').textContent = lastResponse.html || '// kosong';
-                document.getElementById('cssCode').textContent = lastResponse.css || '// kosong';
-                document.getElementById('jsCode').textContent = lastResponse.js || '// kosong';
+                document.getElementById('htmlCode').textContent = lastResponse.html || '// (kosong)';
+                document.getElementById('cssCode').textContent = lastResponse.css || '// (kosong)';
+                document.getElementById('jsCode').textContent = lastResponse.js || '// (kosong)';
 
-                // RENDER PREVIEW
-                const iframe = document.getElementById('previewFrame');
-                
-                const fontName = document.getElementById('font').value;
-                const fontLink = `<link href="https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}:wght@400;600;800&display=swap" rel="stylesheet">`;
-                const faLink = `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">`;
-                
-                let frameworkLink = '';
-                const fw = document.getElementById('framework').value;
-                if (fw.includes('Tailwind')) {
-                    frameworkLink = `<script src="https://cdn.tailwindcss.com"><\/script>`;
-                } else if (fw.includes('Bootstrap')) {
-                    frameworkLink = `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">`;
-                }
+                // === PREVIEW VIA IFRAME SRCDOC (aman utk file://) ===
+                var links = getAssetLinks();
+                var reCloseTag = new RegExp(S_CLOSE, 'gi');
+                var safeJs = lastResponse.js.replace(reCloseTag, function () { return S_CLOSE_ESC; });
 
-                // Escape untuk srcdoc
-                const fullHtmlContent = `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-${fontLink}
-${faLink}
-${frameworkLink}
-<style>${lastResponse.css || ''}</style>
-</head>
-<body>
-${lastResponse.html || ''}
-<script>${lastResponse.js || ''}<\/script>
-</body>
-</html>`;
+                var previewDoc = '<!DOCTYPE html><html><head><meta charset="UTF-8">' + links.fontLink + links.iconLink + links.fwHead +
+                    '<style>' + lastResponse.css + '</style></head><body>' + lastResponse.html + links.fwBody +
+                    S_OPEN + safeJs + S_CLOSE + '</body></html>';
 
-                iframe.srcdoc = fullHtmlContent;
+                document.getElementById('previewFrame').srcdoc = previewDoc;
 
-                statusLog.innerHTML = "✅ Generate sukses! Tombol download aktif.";
+                statusLog.innerHTML = 'Generate sukses! Tombol download sudah aktif.';
                 downloadBtn.disabled = false;
-                
-            } catch (e) {
-                statusLog.innerHTML = "❌ Gagal parse JSON: " + e.message;
-                console.error("Parse Error:", e, text);
+            } catch (err) {
+                statusLog.innerHTML = 'Gagal memproses jawaban AI: ' + err.message + '. Coba lagi / ganti model.';
+                console.error('Parse Error:', err, rawText);
             }
         }
 
-        // ============================================================
-        // DOWNLOAD ZIP
-        // ============================================================
+        // ===== DOWNLOAD AS ZIP =====
         async function downloadZip() {
-            if (!lastResponse.html && !lastResponse.css && !lastResponse.js) {
-                alert('⚠️ Generate dulu!');
-                return;
-            }
+            if (!lastResponse.html) { alert('Belum ada hasil untuk diunduh. Generate dulu!'); return; }
+            statusLog.innerHTML = 'Mengemas file ZIP...';
+            var zip = new JSZip();
+            var links = getAssetLinks();
 
-            statusLog.innerHTML = "⏳ Mengemas ZIP...";
-            const zip = new JSZip();
+            var fullHtml = '<!DOCTYPE html>' + NL +
+                '<html lang="id">' + NL +
+                '<head>' + NL +
+                '  <meta charset="UTF-8">' + NL +
+                '  <meta name="viewport" content="width=device-width, initial-scale=1.0">' + NL +
+                '  <title>Generated by Adjarindo AI</title>' + NL +
+                '  ' + links.fontLink + NL +
+                '  ' + links.iconLink + NL +
+                '  ' + links.fwHead + NL +
+                '  <link rel="stylesheet" href="style.css">' + NL +
+                '</head>' + NL +
+                '<body>' + NL +
+                lastResponse.html + NL +
+                links.fwBody + NL +
+                '  <script src="script.js">' + S_CLOSE + NL +
+                '</body>' + NL +
+                '</html>';
 
-            const fontName = document.getElementById('font').value;
-            const fontLink = `<link href="https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}:wght@400;600;800&display=swap" rel="stylesheet">`;
-            const faLink = `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">`;
-            
-            let frameworkLink = '';
-            const fw = document.getElementById('framework').value;
-            if (fw.includes('Tailwind')) {
-                frameworkLink = `<script src="https://cdn.tailwindcss.com"><\/script>`;
-            } else if (fw.includes('Bootstrap')) {
-                frameworkLink = `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">`;
-            }
+            zip.file('index.html', fullHtml);
+            zip.file('style.css', lastResponse.css);
+            zip.file('script.js', lastResponse.js);
 
-            const fullHtml = `<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generated by Adjarindo AI</title>
-    ${fontLink}
-    ${faLink}
-    ${frameworkLink}
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-${lastResponse.html || ''}
-    <script src="script.js"><\/script>
-</body>
-</html>`;
-            
-            zip.file("index.html", fullHtml);
-            zip.file("style.css", lastResponse.css || '');
-            zip.file("script.js", lastResponse.js || '');
+            var guideText = 'PANDUAN DEPLOY (GITHUB + CLOUDFLARE PAGES)' + NL +
+                '============================================' + NL + NL +
+                '1. UPLOAD KE GITHUB:' + NL +
+                '   - Buat akun/repo baru di https://github.com (Bisa Public/Private).' + NL +
+                '   - Klik "Add file" lalu "Upload files".' + NL +
+                '   - Drag & drop file index.html, style.css, dan script.js ke kotak upload.' + NL +
+                '   - Klik "Commit changes".' + NL + NL +
+                '2. DEPLOY DI CLOUDFLARE PAGES:' + NL +
+                '   - Buka https://dash.cloudflare.com dan login.' + NL +
+                '   - Pilih menu "Workers & Pages" di kiri, lalu klik "Create application".' + NL +
+                '   - Pilih tab "Pages", lalu klik "Connect to Git".' + NL +
+                '   - Hubungkan akun GitHub kamu (Authorize Cloudflare).' + NL +
+                '   - Pilih repository tempat kamu upload file tadi.' + NL +
+                '   - Build settings: Framework preset None, Build command kosong, Build output directory: /' + NL +
+                '   - Klik "Save and Deploy".' + NL + NL +
+                '3. SELESAI:' + NL +
+                '   - Tunggu 1-2 menit sampai status "Success".' + NL +
+                '   - Web kamu online dan bisa diakses dunia!' + NL + NL +
+                '----------------------------------------------' + NL +
+                'Copyright Adjarindo Creative Aksara' + NL +
+                'AjarInd.web.id';
 
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                const a = document.createElement('a');
+            zip.file('DEPLOY_GUIDE.txt', guideText);
+
+            zip.generateAsync({ type: 'blob' }).then(function (content) {
+                var a = document.createElement('a');
                 a.href = URL.createObjectURL(content);
-                a.download = "Adjarindo_Web_Project.zip";
+                a.download = 'Adjarindo_Web_Project.zip';
                 a.click();
                 URL.revokeObjectURL(a.href);
-                statusLog.innerHTML = "✅ ZIP berhasil diunduh!";
+                statusLog.innerHTML = 'ZIP berhasil diunduh!';
             });
         }
 
-        // ============================================================
-        // TAB SWITCHING
-        // ============================================================
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.onclick = function() {
-                document.querySelectorAll('.tab-btn').forEach(b => {
-                    b.classList.remove('active', 'border-blue-500', 'text-blue-400');
-                    b.classList.add('border-transparent', 'text-slate-400');
-                });
-                this.classList.add('active', 'border-blue-500', 'text-blue-400');
-                this.classList.remove('border-transparent', 'text-slate-400');
-                
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-                document.getElementById(this.dataset.tab + 'Tab').classList.remove('hidden');
-            };
+        // ===== TAB SWITCHING =====
+        document.querySelectorAll('.tab-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active', 'border-blue-500', 'text-blue-400'); });
+                btn.classList.add('active', 'border-blue-500', 'text-blue-400');
+                document.querySelectorAll('.tab-content').forEach(function (c) { c.classList.add('hidden'); });
+                document.getElementById(btn.dataset.tab + 'Tab').classList.remove('hidden');
+            });
         });
 
-        // ============================================================
-        // PWA
-        // ============================================================
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
+        // ===== PWA LOGIC =====
+        var deferredPrompt;
+        window.addEventListener('beforeinstallprompt', function (e) {
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('installBtn').classList.remove('hidden');
         });
-        document.getElementById('installBtn').onclick = async () => {
+        document.getElementById('installBtn').addEventListener('click', async function () {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 await deferredPrompt.userChoice;
                 document.getElementById('installBtn').classList.add('hidden');
                 deferredPrompt = null;
             }
-        };
+        });
 
-        // Event
-        generateBtn.onclick = generateCode;
-        downloadBtn.onclick = downloadZip;
-
-        console.log('✅ Adjarindo AI Generator siap!');
+        // Event Listeners
+        generateBtn.addEventListener('click', generateCode);
+        downloadBtn.addEventListener('click', downloadZip);
     </script>
 </body>
 </html>
