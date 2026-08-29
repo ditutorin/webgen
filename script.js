@@ -171,9 +171,9 @@ let savedResults = { prota: '', promes: '', rpp: '', modul: '' };
 
 // ===== KONFIGURASI MODE =====
 const modeConfig = {
-    fast:   { label: 'Fast',   ai: 'groq',   model: 'llama-3.3-70b-versatile', maxTokens: 2048, description: 'Landing page & website sederhana' },
-    standar:{ label: 'Standar',ai: 'groq',   model: 'qwen/qwen3.6-27b',       maxTokens: 4096, description: 'Aplikasi fungsional (Kas RT, Todo, dll)' },
-    pro:    { label: 'Pro',    ai: 'gemini', model: 'gemini-2.5-flash',      maxTokens: 8192, description: 'Aplikasi kompleks (Manajemen, Multi-tab)' }
+    fast:   { label: 'Fast',   ai: 'groq',   model: 'groq/compound-mini', maxTokens: 2048, description: 'Landing page & website sederhana' },
+    standar:{ label: 'Standar',ai: 'groq',   model: 'groq/compound',      maxTokens: 4096, description: 'Aplikasi fungsional (Kas RT, Todo, dll)' },
+    pro:    { label: 'Pro',    ai: 'gemini', model: 'gemini-2.5-flash',  maxTokens: 8192, description: 'Aplikasi kompleks (Manajemen, Multi-tab)' }
 };
 
 // ===== TEMPLATE PROMPT =====
@@ -341,29 +341,59 @@ async function callGemini(prompt, apiKey, maxTokens) {
 }
 
 async function callGroq(prompt, apiKey, model, maxTokens) {
+    // Daftar model yang support JSON mode di Groq
+    const jsonSupportModels = [
+        'groq/compound',
+        'groq/compound-mini',
+        'qwen/qwen3.6-27b',
+        'qwen/qwen3.8-27b',
+        'openai/gpt-oss-120b',
+        'openai/gpt-oss-20b',
+        'openai/gpt-oss-safeguard-20b'
+    ];
+    const supportsJson = jsonSupportModels.includes(model);
+    
+    // System message - harus mengandung kata "json" jika pakai response_format
+    let systemMessage = 'Kamu adalah AI expert yang membantu membuat kode web. Output harus valid dan siap pakai.';
+    if (supportsJson) {
+        systemMessage = 'Kamu adalah AI expert. Output harus berupa JSON valid dengan format {"html": "...", "css": "...", "js": "..."}. Jangan tambahkan teks lain selain JSON.';
+    }
+    
+    const requestBody = {
+        model: model || 'groq/compound',
+        messages: [
+            { role: 'system', content: systemMessage },
+            { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens || 4096
+    };
+    
+    // Hanya tambahkan response_format jika model support
+    if (supportsJson) {
+        requestBody.response_format = { type: 'json_object' };
+    }
+    
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + apiKey
         },
-        body: JSON.stringify({
-            model: model || 'llama-3.3-70b-versatile',
-            messages: [
-                { role: 'system', content: 'Kamu adalah AI expert yang membantu membuat kode web. Output harus valid dan siap pakai.' },
-                { role: 'user', content: prompt }
-            ],
-            temperature: 0.7,
-            max_tokens: maxTokens || 4096,
-            response_format: model && model.includes('qwen') ? { type: 'json_object' } : undefined
-        })
+        body: JSON.stringify(requestBody)
     });
+    
     if (!response.ok) {
         const error = await response.json();
+        console.error('Groq Error Details:', error);
         throw new Error('Groq Error: ' + (error.error?.message || 'Unknown'));
     }
+    
     const data = await response.json();
-    if (!data.choices || data.choices.length === 0) throw new Error('Groq: Tidak ada response');
+    if (!data.choices || data.choices.length === 0) {
+        throw new Error('Groq: Tidak ada response');
+    }
+    
     return data.choices[0].message.content;
 }
 
